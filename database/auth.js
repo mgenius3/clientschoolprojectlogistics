@@ -15,6 +15,7 @@ const fileExists = async (filePath) => {
 const createFileUser = async () => {
   console.log('hello');
   try {
+<<<<<<< HEAD
     const fileExist = await fileExists('./data/user.json');
     if (!fileExist) {
       await fs.promises.writeFile(
@@ -22,6 +23,27 @@ const createFileUser = async () => {
         JSON.stringify({ users: [], nextId: 100 })
       );
     }
+=======
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+    let checkUsertableExists = await tableExists('user');
+    const user_table = checkUsertableExists
+      ? null
+      : await connection.query(`CREATE TABLE user (
+      id INT NOT NULL AUTO_INCREMENT,
+      admin BIT DEFAULT 0,
+      firstName VARCHAR(255) NOT NULL,
+      lastName VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      telephone VARCHAR(255) NOT NULL,
+      address VARCHAR(255) NOT NULL,
+      token VARCHAR(1000) DEFAULT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      UNIQUE(email)
+    ) AUTO_INCREMENT=100`);
+>>>>>>> 5f9b447fdc8003b8d1a8621457785b1fcebac0ca
   } catch (err) {
     console.error(err.message);
   }

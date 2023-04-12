@@ -9,7 +9,11 @@ const initializePaystackTransaction = async (req, service, amount) => {
   const params = JSON.stringify({
     email: req?.user?.email,
     amount: amount * 100,
+<<<<<<< HEAD
     callback_url: `http://localhost:5000/dashboard/user/${service}`, // Set the redirect URL here
+=======
+    callback_url: `http://localhost:3000/dashboard/user/${service}`, // Set the redirect URL here
+>>>>>>> 5f9b447fdc8003b8d1a8621457785b1fcebac0ca
     metadata: {
       custom_fields: [
         {

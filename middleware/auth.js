@@ -4,7 +4,9 @@ dotenv.config();
 const config = process.env;
 
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
+  const token =
+    req.headers.authorization &&
+    req.headers.authorization.replace('Bearer ', '');
 
   if (!token) {
     res.status(403).json({ msg: 'A token is required for authentication' });
