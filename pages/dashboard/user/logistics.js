@@ -77,7 +77,18 @@ const UserLogistics = () => {
                 <td>{item?.id}</td>
                 <td>{shortenString(item?.pickupAddress, 20)}</td>
                 <td>{shortenString(item?.deliveryAddress, 20)}</td>
-                <td>{item?.status}</td>
+                <td
+                  style={{
+                    color:
+                      item?.status == 'pending'
+                        ? 'red'
+                        : item?.status == 'in transit'
+                        ? '#f1c40f'
+                        : 'green',
+                  }}
+                >
+                  {item?.status}
+                </td>
                 <td>{item?.receiverCode}</td>
               </tr>
             ))}

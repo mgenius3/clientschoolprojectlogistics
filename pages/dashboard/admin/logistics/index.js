@@ -5,7 +5,7 @@ import { Modal, Button } from 'react-bootstrap';
 import ConfirmationInput from '../../../../components/Confirmation';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { useRouter } from 'next/router';
 const UserLogistics = () => {
   const [token] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -13,6 +13,7 @@ const UserLogistics = () => {
     }
   });
 
+  const router = useRouter();
   const [data, setData] = useState([]);
   // const [items, setItems] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -26,7 +27,6 @@ const UserLogistics = () => {
   useEffect(() => {
     const fetchLogistics = async () => {
       try {
-        console.log(data);
         const response = await fetch('/admin/logistics', {
           method: 'GET',
           headers: {
@@ -78,6 +78,7 @@ const UserLogistics = () => {
       const res = await response.json();
       toast.success(res?.msg);
       setIsLoadingUpdateStatus(false);
+      router.reload();
     } catch (err) {
       console.log(err);
     }
@@ -249,7 +250,8 @@ const UserLogistics = () => {
           <Modal show={true}>
             <ConfirmationInput
               setConfirmation={setConfirmation}
-              updateStatus={updateStatus}
+              action={updateStatus}
+              title={`to update logistics status`}
             />
           </Modal>
         ) : null}

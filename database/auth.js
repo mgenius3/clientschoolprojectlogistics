@@ -91,7 +91,7 @@ const getUser = async (id) => {
     }
     return user;
   } catch (err) {
-    throw err.message;
+    throw new Error(err.message);
   }
 };
 
@@ -105,7 +105,7 @@ const getUserByEmail = async (email) => {
     }
     return user;
   } catch (err) {
-    throw err.message;
+    throw new Error(err.message);
   }
 };
 
