@@ -2,6 +2,8 @@ import React, { useState, Fragment, useEffect } from 'react';
 import Link from 'next/link';
 import jwtDecode from 'jwt-decode';
 import { getInitials } from '../../utils/stringManipulation';
+import logout from '../../utils/logout';
+import { useRouter } from 'next/router';
 
 export default function MainHeader() {
   const [token] = useState(() => {
@@ -12,6 +14,7 @@ export default function MainHeader() {
   const [user, setUser] = useState({});
   const [openMobileNav, setOpenMobileNav] = useState(false);
   const [avatarMenu, setAvatarMenu] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     try {
@@ -20,9 +23,13 @@ export default function MainHeader() {
     } catch (err) {
       console.log(err);
     }
-  }, [user]);
+  }, [token]);
 
-  console.log(user);
+  const userlogout = () => {
+    let out = logout();
+    if (out) router.push('/login');
+  };
+
   return (
     //  <!--Header-->
     <Fragment>
@@ -262,7 +269,7 @@ export default function MainHeader() {
                               className="dropdown-item"
                               style={{ cursor: 'pointer' }}
                             >
-                              <Link href={`/dashboard/user/${user?.id}`}>
+                              <Link href={`/dashboard/user/market`}>
                                 <span>
                                   <img
                                     src="https://img.icons8.com/ios-filled/50/null/user.png"
@@ -276,16 +283,15 @@ export default function MainHeader() {
                             <li
                               className="dropdown-item"
                               style={{ cursor: 'pointer' }}
+                              onClick={() => userlogout()}
                             >
-                              <Link href="/login">
-                                <span>
-                                  <img
-                                    src="https://img.icons8.com/ios-filled/50/null/logout-rounded.png"
-                                    width={15}
-                                  />{' '}
-                                  logout
-                                </span>
-                              </Link>
+                              <span>
+                                <img
+                                  src="https://img.icons8.com/ios-filled/50/null/logout-rounded.png"
+                                  width={15}
+                                />{' '}
+                                logout
+                              </span>
                             </li>
                           </ul>
                         ) : null}

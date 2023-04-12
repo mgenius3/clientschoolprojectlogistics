@@ -4939,7 +4939,7 @@ input.checkbox {
 }
 .modal-open .modal {
   padding-right: 0 !important;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 /*======================================================================

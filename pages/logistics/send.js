@@ -36,9 +36,6 @@ export default function Logistics() {
   };
 
   const submitPackageDetails = async () => {
-    // console.log(data);
-    // sendPackageMutation.mutate(data);
-
     setIsLoading(true);
     try {
       console.log(data);
@@ -57,8 +54,8 @@ export default function Logistics() {
         throw new Error(res.msg);
       }
       const res = await response.json();
-      setIsLoading(false);
       if (window !== undefined) window.location.replace(`${res.msg}`);
+      setIsLoading(false);
     } catch (err) {
       setIsLoading(false);
       toast.error(err.message);
@@ -280,7 +277,10 @@ export default function Logistics() {
                             id="input-zone"
                             onChange={handleInputChange}
                           >
-                            <option disabled> --- Please Select --- </option>
+                            <option disabled selected>
+                              {' '}
+                              --- Please Select ---{' '}
+                            </option>
                             {statesInNigeria?.map((state, i) => (
                               <option value={state} key={i}>
                                 {state}

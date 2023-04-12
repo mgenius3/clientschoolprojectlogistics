@@ -1,43 +1,27 @@
 const fs = require('fs');
-const { pool } = require('../config/db');
 
-//check if table exist before create one
-const tableExists = async (tableName) => {
+// check if file exists before reading/writing
+const fileExists = async (filePath) => {
   try {
-    const conn = await pool.getConnection();
-    const [rows, fields] = await conn.execute(
-      `SHOW TABLES LIKE '${tableName}'`
-    );
-    conn.release();
-    return rows.length > 0;
+    await fs.promises.access(filePath, fs.constants.F_OK);
+    return true;
   } catch (err) {
-    console.error('Error checking if table exists:', err);
+    console.error('Error checking if file exists:', err);
     return false;
   }
 };
 
-//create table user
-const createTableUser = async () => {
+// create file user.json if it does not exist
+const createFileUser = async () => {
+  console.log('hello');
   try {
-    const connection = await pool.getConnection();
-    await connection.beginTransaction();
-    let checkUsertableExists = await tableExists('user');
-    const user_table = checkUsertableExists
-      ? null
-      : await connection.query(`CREATE TABLE User (
-      id INT NOT NULL AUTO_INCREMENT,
-      admin BIT DEFAULT 0,
-      firstName VARCHAR(255) NOT NULL,
-      lastName VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL,
-      password VARCHAR(255) NOT NULL,
-      telephone VARCHAR(255) NOT NULL,
-      address VARCHAR(255) NOT NULL,
-      token VARCHAR(1000) DEFAULT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      PRIMARY KEY (id),
-      UNIQUE(email)
-    ) AUTO_INCREMENT=100`);
+    const fileExist = await fileExists('./data/user.json');
+    if (!fileExist) {
+      await fs.promises.writeFile(
+        './data/user.json',
+        JSON.stringify({ users: [], nextId: 100 })
+      );
+    }
   } catch (err) {
     console.error(err.message);
   }
@@ -53,10 +37,16 @@ const registerUser = async ({
   admin,
 }) => {
   try {
-    const connection = await pool.getConnection();
-    await connection.beginTransaction();
-    const register_query = `INSERT INTO user (email, password, firstName, lastName, telephone, address, admin) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    const new_registered_user = await pool.query(register_query, [
+    const data = await fs.promises.readFile('./data/user.json', 'utf-8');
+    const { users, nextId } = JSON.parse(data);
+
+    const existingUser = users.find((user) => user.email === email);
+    if (existingUser) {
+      throw new Error('email already exists');
+    }
+
+    const newUser = {
+      id: nextId,
       email,
       password,
       firstName,
@@ -64,22 +54,26 @@ const registerUser = async ({
       telephone,
       address,
       admin,
-    ]);
-    return new_registered_user[0].insertId;
+      created_at: new Date(),
+    };
+    const updatedUsers = [...users, newUser];
+    const updatedData = JSON.stringify({
+      users: updatedUsers,
+      nextId: nextId + 1,
+    });
+    await fs.promises.writeFile('./data/user.json', updatedData);
+
+    return newUser.id;
   } catch (err) {
     console.log(err);
-    if (err.code == 'ER_DUP_ENTRY') err.message = 'email already exist';
     throw err.message;
   }
 };
 
 const getUsers = async () => {
   try {
-    const query = 'SELECT * FROM user';
-    const connection = await pool.getConnection();
-    const users = await connection.query(query);
-    await connection.release();
-
+    const data = await fs.promises.readFile('./data/user.json', 'utf-8');
+    const { users } = JSON.parse(data);
     return users;
   } catch (err) {
     throw err.message;
@@ -87,39 +81,50 @@ const getUsers = async () => {
 };
 
 const getUser = async (id) => {
-  let connection = await pool.getConnection();
-  (await connection).beginTransaction();
-  let get_user = await connection.query(`SELECT * FROM user WHERE id = ${id}`);
-  await connection.release();
-
-  return get_user[0];
+  try {
+    const data = await fs.promises.readFile('./data/user.json', 'utf-8');
+    const { users } = JSON.parse(data);
+    const user = users.find((user) => user.id === id);
+    if (!user) {
+      throw new Error('user not found');
+    }
+    console.log(user);
+    return user;
+  } catch (err) {
+    throw err.message;
+  }
 };
 
 const getUserByEmail = async (email) => {
-  let connection = await pool.getConnection();
-  (await connection).beginTransaction();
-  let get_user_by_email = await connection.query(
-    `SELECT * FROM user WHERE email = '${email}'`
-  );
-  await connection.release();
-
-  return get_user_by_email[0];
+  try {
+    const data = await fs.promises.readFile('./data/user.json', 'utf-8');
+    const { users } = JSON.parse(data);
+    const user = users.find((user) => user.email === email);
+    if (!user) {
+      throw new Error('user not found');
+    }
+    return user;
+  } catch (err) {
+    throw err.message;
+  }
 };
 
 const updateUserToken = async (id, token) => {
   try {
-    let connection = await pool.getConnection();
-    (await connection).beginTransaction();
-    const query = `UPDATE user SET token = ? WHERE id = ?`;
-    await pool.query(query, [token, id]);
-    await connection.release();
+    const data = await fs.promises.readFile('./data/user.json', 'utf-8');
+    const { users } = JSON.parse(data);
+    const updatedUsers = users.map((user) =>
+      user.id === id ? { ...user, token } : user
+    );
+    const updatedData = JSON.stringify({ users: updatedUsers });
+    await fs.promises.writeFile('./data/user.json', updatedData);
   } catch (err) {
     throw err.message;
   }
 };
 
 module.exports = {
-  createTableUser,
+  createFileUser,
   registerUser,
   getUsers,
   getUser,

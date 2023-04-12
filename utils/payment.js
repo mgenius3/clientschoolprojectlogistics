@@ -5,11 +5,11 @@ const paystack = require('paystack');
 dotenv.config();
 paystack(process.env.PAYSTACK_SECRET_KEY);
 
-const initializePaystackTransaction = async (req) => {
+const initializePaystackTransaction = async (req, service, amount) => {
   const params = JSON.stringify({
     email: req?.user?.email,
-    amount: '20000',
-    callback_url: `http://localhost:3000/dashboard/user/logistics`, // Set the redirect URL here
+    amount: amount * 100,
+    callback_url: `http://localhost:5000/dashboard/user/${service}`, // Set the redirect URL here
     metadata: {
       custom_fields: [
         {

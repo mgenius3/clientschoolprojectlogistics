@@ -26,7 +26,7 @@
 
 #account > aside {
   padding: 10px 20px;
-  height: 100vh;
+  /* height: 100vh; */
   overflow-y: auto;
   width: 200px;
   background: white;

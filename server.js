@@ -7,10 +7,10 @@ const dev = process.env.NODE_ENV !== 'production';
 dotenv.config();
 const app = next({ dev });
 const handle = app.getRequestHandler();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 const errorHandler = require('./middleware/errorHandler');
 const morgan = require('morgan');
-const { createTableUser } = require('./database/auth');
+const { createFileUser } = require('./database/auth');
 const { createTableLogistics } = require('./database/logistics');
 const { createTableSell } = require('./database/sell');
 
@@ -18,7 +18,7 @@ app.prepare().then(() => {
   const server = express();
 
   //Create Table for User
-  createTableUser();
+  createFileUser();
   createTableLogistics();
   createTableSell();
 
@@ -30,11 +30,12 @@ app.prepare().then(() => {
   //Create Table for Sell
   server.use('/sell', require('./routes/sell'));
   server.use('/user', require('./routes/auth'));
+  server.use('/admin', require('./routes/admin'));
 
   //Create Table for Logistics
 
-  //error handling
-  // server.use(errorHandler);
+  // error handling
+  server.use(errorHandler);
 
   // Default route handler
   server.get('*', (req, res) => {

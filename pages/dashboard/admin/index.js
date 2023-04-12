@@ -1,30 +1,14 @@
 import React, { useRef } from 'react';
 import Link from 'next/link';
 // import './account.css';
-// import './helper.css';
 
+// import useAuth from '../../../hooks/useAuth';
 import PageAuthentication from '../../../hooks/useAuth';
 
 function Account() {
   const asideRef = useRef();
+  // const user = useAuth();
 
-  // const [userDetails, setuserDetails] = useState();
-  // const [redirect, setRedirect] = useState(false);
-
-  // const Logout = () => {
-  //   let confirm = window.confirm('Are you sure you want to logout');
-
-  //   if (confirm === true) {
-  //     localStorage.clear(); //clear all our user details
-  //     setRedirect(true); //redirect to sign in
-  //   }
-  // };
-  // useEffect(() => {
-  //   const { people: getUserDetails } = JSON.parse(
-  //     localStorage.getItem('userDetails')
-  //   );
-  //   if (getUserDetails) setuserDetails(getUserDetails);
-  // }, []);
   return (
     <PageAuthentication>
       <main id="account">

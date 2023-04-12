@@ -7,13 +7,13 @@ const createTableSell = async () => {
   try {
     const connection = await pool.getConnection();
     await connection.beginTransaction();
-    let checkUsertableExists = await tableExists('Sell');
+    let checkUsertableExists = await tableExists('sell');
     const user_table = checkUsertableExists
       ? null
-      : await connection.query(`CREATE TABLE Sell (
+      : await connection.query(`CREATE TABLE sell (
       id INT NOT NULL AUTO_INCREMENT,
       sellerId INT NOT NULL,
-      files JSON,
+      files LONGTEXT NOT NULL,
       title VARCHAR(255) NOT NULL,
       location VARCHAR(1000) NOT NULL,
       city VARCHAR(255) NOT NULL,
@@ -24,6 +24,7 @@ const createTableSell = async () => {
       price VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
       paid BIT DEFAULT 0,
+      referenceId VARCHAR(255),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (id)
     ) AUTO_INCREMENT=1000`);
@@ -49,7 +50,7 @@ const sendPackageDetails = async (data) => {
   try {
     const connection = await pool.getConnection();
     await connection.beginTransaction();
-    const sell_query = `INSERT INTO Sell (sellerId, files, title, location, city, state, category, material, conditions, price, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sell_query = `INSERT INTO sell (sellerId, files, title, location, city, state, category, material, conditions, price, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const new_sell_user = await pool.query(sell_query, [
       sellerId,
       files,
@@ -70,7 +71,7 @@ const sendPackageDetails = async (data) => {
 };
 
 const getAllSell = async () => {
-  const query = 'SELECT * FROM Sell';
+  const query = 'SELECT * FROM sell';
   const connection = await pool.getConnection();
   const users = await connection.query(query);
   await connection.release();
@@ -81,7 +82,7 @@ const sellDetailById = async (id) => {
   let connection = await pool.getConnection();
   (await connection).beginTransaction();
   let get_package = await connection.query(
-    `SELECT * FROM Sell WHERE id = '${id}'`
+    `SELECT * FROM sell WHERE id = '${id}'`
   );
   await connection.release();
   return get_package[0];
@@ -91,16 +92,53 @@ const getAUserSell = async (sellerId) => {
   let connection = await pool.getConnection();
   (await connection).beginTransaction();
   let get_user_sell = await connection.query(
-    `SELECT * FROM Sell WHERE sellerId = '${sellerId}'`
+    `SELECT * FROM sell WHERE sellerId = '${sellerId}'`
   );
   await connection.release();
   return get_user_sell[0];
 };
 
+const setPackageReference = async (referenceId, id) => {
+  try {
+    let connection = await pool.getConnection();
+    (await connection).beginTransaction();
+    const query = `UPDATE sell SET referenceId = ? WHERE id = ?`;
+    await pool.query(query, [referenceId, id]);
+    await connection.release();
+  } catch (err) {
+    throw err.message;
+  }
+};
+const updatePackagePayment = async (paid, id) => {
+  try {
+    let connection = await pool.getConnection();
+    (await connection).beginTransaction();
+    const query = `UPDATE sell SET paid = ? WHERE id = ?`;
+    await pool.query(query, [paid, id]);
+    await connection.release();
+  } catch (err) {
+    throw err.message;
+  }
+};
+
+const deletePackage = async (id) => {
+  try {
+    let connection = await pool.getConnection();
+    (await connection).beginTransaction();
+    const query = 'DELETE FROM sell WHERE id = ?';
+    await pool.query(query, [id]);
+    await connection.release();
+  } catch (err) {
+    throw err.message;
+  }
+};
 module.exports = {
   createTableSell,
   sendPackageDetails,
   getAllSell,
   sellDetailById,
   getAUserSell,
+  setPackageReference,
+  updatePackagePayment,
+  deletePackage,
 };

@@ -1,45 +1,22 @@
+/////////////////////
 const fs = require('fs');
-const { pool } = require('../config/db');
 const { tableExists } = require('../utils/checkTableExist');
 
-//create table user
+const DATA_FILE_PATH = './data/logistics.json';
+
+// create table logistics
 const createTableLogistics = async () => {
   try {
-    const connection = await pool.getConnection();
-    await connection.beginTransaction();
-    let checkUsertableExists = await tableExists('Logistics');
-    const user_table = checkUsertableExists
-      ? null
-      : await connection.query(`CREATE TABLE Logistics (
-      id INT NOT NULL AUTO_INCREMENT,
-      userId VARCHAR(255) NOT NULL,
-      files JSON,
-      firstName VARCHAR(255) NOT NULL,
-      lastName VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL,
-      telephone VARCHAR(255) NOT NULL,
-      company VARCHAR(255),
-      pickupAddress VARCHAR(255) NOT NULL,
-      pickupCity VARCHAR(255) NOT NULL,
-      pickupState VARCHAR(255) NOT NULL,
-      postCode VARCHAR(255) NOT NULL,
-      deliveryAddress VARCHAR(255) NOT NULL,
-      deliveryCity VARCHAR(255) NOT NULL,
-      deliveryState VARCHAR(255) NOT NULL,
-      receiverCode VARCHAR(255) NOT NULL,
-      receiverTelephone VARCHAR(255) NOT NULL,
-      status VARCHAR(255) DEFAULT 'pending',
-      paid BIT DEFAULT 0,
-      referenceId VARCHAR(255),
-      description TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      PRIMARY KEY (id)
-    ) AUTO_INCREMENT=1000`);
+    let checkLogisticstableExists = fs.existsSync(DATA_FILE_PATH);
+    if (!checkLogisticstableExists) {
+      fs.writeFileSync(DATA_FILE_PATH, '[]');
+    }
   } catch (err) {
     console.error(err.message);
   }
 };
 
+// send package details
 const sendPackageDetails = async (data) => {
   const {
     userId,
@@ -61,10 +38,9 @@ const sendPackageDetails = async (data) => {
     description,
   } = data;
   try {
-    const connection = await pool.getConnection();
-    await connection.beginTransaction();
-    const logistics_query = `INSERT INTO logistics (userId, files, firstName, lastName, email, telephone, company, pickupAddress, pickupCity, pickupState, postcode, receiverTelephone, deliveryAddress, deliveryCity, deliveryState, receiverCode, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?, ?, ?)`;
-    const new_logistics_user = await pool.query(logistics_query, [
+    const logisticsData = JSON.parse(fs.readFileSync(DATA_FILE_PATH));
+    const newLogistic = {
+      id: logisticsData.length + 1000,
       userId,
       files,
       firstName,
@@ -82,79 +58,81 @@ const sendPackageDetails = async (data) => {
       deliveryState,
       receiverCode,
       description,
-    ]);
-    return new_logistics_user[0].insertId;
+      status: 'pending',
+      paid: false,
+      referenceId: null,
+      created_at: new Date().toISOString(),
+    };
+    logisticsData.push(newLogistic);
+    fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(logisticsData));
+    return newLogistic.id;
   } catch (err) {
     console.error(err);
     throw err.message;
   }
 };
 
+// get all package
 const getAllPackage = async () => {
-  const query = 'SELECT * FROM logistics';
-  const connection = await pool.getConnection();
-  const users = await connection.query(query);
-  await connection.release();
-
-  return users;
+  const logisticsData = JSON.parse(fs.readFileSync(DATA_FILE_PATH));
+  return logisticsData;
 };
 
+// package detail by id
 const packageDetailById = async (id) => {
-  let connection = await pool.getConnection();
-  (await connection).beginTransaction();
-  let get_package = await connection.query(
-    `SELECT * FROM logistics id = ${id}`
-  );
-  await connection.release();
-  return get_package;
+  const logisticsData = JSON.parse(fs.readFileSync(DATA_FILE_PATH));
+  const logistics = logisticsData.find((item) => item.id === id);
+  return logistics;
 };
 
+// get a user package
 const getAUserPackage = async (userId) => {
-  let connection = await pool.getConnection();
-  (await connection).beginTransaction();
-  let get_user_package = await connection.query(
-    `SELECT * FROM logistics WHERE userId = '${userId}'`
-  );
-  await connection.release();
-  return get_user_package[0];
+  const logisticsData = JSON.parse(fs.readFileSync(DATA_FILE_PATH));
+  const logistics = logisticsData.filter((item) => item.userId === userId);
+  return logistics;
 };
 
+// update package status
 const updatePackageStatus = async (id, status) => {
   try {
-    let connection = await pool.getConnection();
-    (await connection).beginTransaction();
-    const query = `UPDATE logistics SET status = ? WHERE id = ?`;
-    await pool.query(query, [status, id]);
-    await connection.release();
+    const logisticsData = JSON.parse(fs.readFileSync(DATA_FILE_PATH));
+    const logistics = logisticsData.find((item) => item.id === id);
+    if (logistics) {
+      logistics.status = status;
+      fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(logisticsData));
+    }
   } catch (err) {
     throw err.message;
   }
 };
 
+// set package reference
 const setPackageReference = async (referenceId, id) => {
-  console.log(referenceId, id);
   try {
-    let connection = await pool.getConnection();
-    (await connection).beginTransaction();
-    const query = `UPDATE logistics SET referenceId = ? WHERE id = ?`;
-    await pool.query(query, [referenceId, id]);
-    await connection.release();
+    const logisticsData = JSON.parse(fs.readFileSync(DATA_FILE_PATH));
+    const logistics = logisticsData.find((item) => item.id === id);
+    if (logistics) {
+      logistics.referenceId = referenceId;
+      fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(logisticsData));
+    }
   } catch (err) {
     throw err.message;
   }
 };
+
+// update package payment
 const updatePackagePayment = async (paid, id) => {
   try {
-    let connection = await pool.getConnection();
-    (await connection).beginTransaction();
-    const query = `UPDATE logistics SET paid = ? WHERE id = ?`;
-    await pool.query(query, [paid, id]);
-    await connection.release();
+    const logisticsData = JSON.parse(fs.readFileSync(DATA_FILE_PATH));
+    const logistics = logisticsData.find((item) => item.id === id);
+    if (logistics) {
+      logistics.paid = paid;
+      fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(logisticsData));
+    }
   } catch (err) {
     throw err.message;
   }
 };
-
 module.exports = {
   createTableLogistics,
   sendPackageDetails,

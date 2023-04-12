@@ -4,6 +4,8 @@ const {
   setPackageReference,
   getAUserPackage,
   updatePackagePayment,
+  getAllPackage,
+  updatePackageStatus,
 } = require('../database/logistics');
 const {
   initializePaystackTransaction,
@@ -17,7 +19,11 @@ const PackageSent = async (req, res) => {
     await packageValidation(req.body);
     let packagesId = await sendPackageDetails(req.body);
     //initialize payment
-    let initialize_payment = await initializePaystackTransaction(req);
+    let initialize_payment = await initializePaystackTransaction(
+      req,
+      'logistics',
+      20000
+    );
     //set references on db
     await setPackageReference(initialize_payment?.data?.reference, packagesId);
     res.status(201).json({ msg: initialize_payment?.data?.authorization_url });
@@ -48,4 +54,27 @@ const ReceiveUserPackage = async (req, res) => {
   }
 };
 
-module.exports = { PackageSent, ReceiveUserPackage };
+const getAllPackages = async (req, res) => {
+  try {
+    const allPackages = await getAllPackage();
+    res.status(200).json({ msg: allPackages });
+  } catch (err) {
+    res.status(400).json({ msg: err.message });
+  }
+};
+
+const packageStatusUpdate = async (req, res) => {
+  try {
+    const { id, status } = req.body;
+    await updatePackageStatus(id, status);
+    res.status(200).json({ msg: 'successful' });
+  } catch (err) {
+    res.status(400).json({ msg: err.message });
+  }
+};
+module.exports = {
+  PackageSent,
+  ReceiveUserPackage,
+  getAllPackages,
+  packageStatusUpdate,
+};
