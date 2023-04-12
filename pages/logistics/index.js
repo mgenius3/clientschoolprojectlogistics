@@ -6,6 +6,24 @@ import React, { useEffect } from 'react';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Slider from 'react-slick';
+import { Container, Row, Button, Col } from 'react-bootstrap';
+import styled from 'styled-components';
+
+const TextContainer = styled.div`
+  background-color: #f8f8f8;
+  padding: 2rem;
+`;
+
+const Heading = styled.h2`
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+`;
+
+const Paragraph = styled.p`
+  font-size: 1.2rem;
+  line-height: 1.5;
+`;
 export default function Logistics() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -157,7 +175,48 @@ export default function Logistics() {
         {/*<!--Featured Product-->*/}
 
         {/*<!--End Featured Product-->*/}
-
+        <TextContainer>
+          <Heading>About Us</Heading>
+          <Paragraph>
+            Kupon is a leading provider of logistics and ecommerce services for
+            businesses of all sizes. Founded in [year], our company has
+            established a reputation for excellence in the industry by
+            delivering reliable and cost-effective solutions that help our
+            clients grow and succeed.
+          </Paragraph>
+        </TextContainer>
+        <br />
+        <Container>
+          <Row>
+            <Col md={6} className="text-center text-md-left">
+              <h1>Welcome to Kupon Logistics</h1>
+              <p>
+                Our logistics services include transportation, warehousing,
+                inventory management, and distribution. We work with businesses
+                to optimize their supply chain operations, reduce costs, and
+                improve efficiency. By leveraging our extensive network of
+                carriers and warehouses, we can provide customized solutions
+                that meet the unique needs of each client.
+              </p>
+              <Link href="/logistics">
+                <Button variant="primary" className="my-4 ">
+                  Get Started
+                </Button>
+              </Link>
+            </Col>
+            <Col
+              md={6}
+              className="d-flex justify-content-center align-items-center"
+            >
+              <img
+                src="/images/slideshow-banners/trucks.jpg"
+                alt="placeholder"
+                className="img-fluid"
+              />
+            </Col>
+          </Row>
+          <hr />
+        </Container>
         {/*<!--Store Feature-->*/}
         <div className="store-feature section">
           <div className="container">
