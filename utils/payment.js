@@ -9,7 +9,10 @@ const initializePaystackTransaction = async (req, service, amount) => {
   const params = JSON.stringify({
     email: req?.user?.email,
     amount: amount * 100,
-    callback_url: `http://localhost:5000/dashboard/user/${service}`, // Set the redirect URL here
+    callback_url:
+      process.env.NODE_ENV == 'production'
+        ? `https://amenze.onrender.com/dashboard/user/${service}`
+        : `http://localhost:5000/dashboard/user/${service}`, // Set the redirect URL here
     metadata: {
       custom_fields: [
         {
