@@ -20,6 +20,7 @@ const RegisterNewUser = async (req, res) => {
 
     let user = await getUser(new_user_id);
 
+    console.log(user);
     //CREATE TOKEN
     const token = jwt.sign(
       {

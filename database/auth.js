@@ -45,8 +45,9 @@ const registerUser = async ({
       throw new Error('email already exists');
     }
 
+    console.log(nextId);
     const newUser = {
-      id: nextId,
+      id: users.length + 100,
       email,
       password,
       firstName,
@@ -88,7 +89,6 @@ const getUser = async (id) => {
     if (!user) {
       throw new Error('user not found');
     }
-    console.log(user);
     return user;
   } catch (err) {
     throw err.message;
