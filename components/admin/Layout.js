@@ -93,11 +93,7 @@ function UserLayout({ children }) {
                 </span>
               </Link>
 
-<<<<<<< HEAD
               {/* <Link href="market">
-=======
-              <Link href="market">
->>>>>>> 5f9b447fdc8003b8d1a8621457785b1fcebac0ca
                 <span style={{ cursor: 'pointer' }}>
                   <img
                     src="https://img.icons8.com/material-outlined/24/FD7E14/dashboard-layout.png"
@@ -105,11 +101,7 @@ function UserLayout({ children }) {
                   />
                   <b>Market</b>
                 </span>
-<<<<<<< HEAD
               </Link> */}
-=======
-              </Link>
->>>>>>> 5f9b447fdc8003b8d1a8621457785b1fcebac0ca
 
               <span style={{ cursor: 'pointer' }} onClick={() => userlogout()}>
                 <img
@@ -130,37 +122,21 @@ function UserLayout({ children }) {
                   onClick={() => asideRef.current.classList.add('menu')}
                 />
 
-<<<<<<< HEAD
                 <h3>Admin Settings</h3>
                 <p style={{ opacity: '0.7' }}>
                   Manage your Admin and Organization settings
                 </p>
               </div>
               {/* <nav>
-=======
-                <h3>Settings</h3>
-                <p style={{ opacity: '0.7' }}>
-                  Manage your personal and organization settings
-                </p>
-              </div>
-              <nav>
->>>>>>> 5f9b447fdc8003b8d1a8621457785b1fcebac0ca
                 <ul style={{ listStyle: 'none', margin: '10px' }}>
                   <li style={{ margin: '10px' }}>
                     <Link href="profile">Profile</Link>
                   </li>
                   <li style={{ margin: '10px' }}>
-<<<<<<< HEAD
                     <Link href="password">Password</Link> 
                   </li>
                 </ul>
               </nav> */}
-=======
-                    <Link href="password">Password</Link>
-                  </li>
-                </ul>
-              </nav>
->>>>>>> 5f9b447fdc8003b8d1a8621457785b1fcebac0ca
             </header>
 
             <article>{children}</article>

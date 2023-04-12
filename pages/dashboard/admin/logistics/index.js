@@ -111,15 +111,9 @@ const UserLogistics = () => {
                 <td
                   style={{
                     color:
-<<<<<<< HEAD
                       item?.status == 'pending'
                         ? 'red'
                         : item?.status == 'in transit'
-=======
-                      modalData?.status == 'pending'
-                        ? 'red'
-                        : modalData?.status == 'in transit'
->>>>>>> 5f9b447fdc8003b8d1a8621457785b1fcebac0ca
                         ? '#f1c40f'
                         : 'green',
                   }}
